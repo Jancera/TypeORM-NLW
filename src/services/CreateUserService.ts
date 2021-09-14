@@ -1,32 +1,35 @@
-import {getCustomRepository} from 'typeorm';
-import {UsersRepository} from '../repositories/UserRepositories';
+import { getCustomRepository } from "typeorm";
+import { UsersRepositories } from "../respositories/UserRepositories";
+import {Channel} from "../entities/Channel"
+import {validate} from "class-validator";
 
 interface IUserRequest {
-  name: string;
-  email: string;
-  admin?: boolean;
+  email: string
+  firstName: string;
+  channel:Channel;
 }
 
 class CreateUserService {
-  async execute({name, email, admin}: IUserRequest) {
-    const usersRepository = getCustomRepository(UsersRepository);
+  async execute({ email, firstName, channel }: IUserRequest) {
+    const userRepository = getCustomRepository(UsersRepositories);
 
-    if (!email) {
-      throw new Error('Email incorrect');
+    const user = userRepository.create({
+        email, 
+        firstName,
+        channel
+    });
+
+    const errors = await validate(user);
+    if (errors.length > 0) {
+        console.log(errors);
+        throw new Error(`Validation failed!`); 
+    } else {
+        await userRepository.save(user);
     }
-
-    const userAlredyExists = await usersRepository.findOne({email});
-
-    if (userAlredyExists) {
-      throw new Error('User already exists');
-    }
-
-    const user = usersRepository.create({name, email, admin});
-
-    await usersRepository.save(user);
+    
 
     return user;
   }
 }
 
-export {CreateUserService};
+export { CreateUserService };

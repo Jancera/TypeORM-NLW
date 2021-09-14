@@ -1,31 +1,24 @@
 import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
+    Entity,
+    PrimaryGeneratedColumn,
+    CreateDateColumn,
+    UpdateDateColumn,
+    Column,
 } from 'typeorm';
-import {v4 as uuid} from 'uuid';
+import { Length } from "class-validator";
 
-@Entity('tags')
-class Tag {
-  @PrimaryColumn()
-  readonly id: string;
+@Entity("tags")
+export class Tag {
+    @PrimaryGeneratedColumn("uuid")
+    id: string;
 
-  @Column()
-  name: string;
+    @Column({ unique: true })
+    @Length(2, 20)
+    name: string;
 
-  @CreateDateColumn()
-  created_at: Date;
-
-  @UpdateDateColumn()
-  updated_at: Date;
-
-  constructor() {
-    if (!this.id) {
-      this.id = uuid();
-    }
-  }
+    @CreateDateColumn()
+    created_at: Date;
+  
+    @UpdateDateColumn()
+    updated_at: Date;
 }
-
-export {Tag};

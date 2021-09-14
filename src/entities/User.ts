@@ -1,37 +1,33 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
+import { 
+    Entity, 
+    PrimaryGeneratedColumn, 
+    Column, 
+    OneToOne, 
+    CreateDateColumn,
+    UpdateDateColumn
 } from 'typeorm';
-import {v4 as uuid} from 'uuid';
+import { IsEmail,Length } from "class-validator";
+import { Channel } from './Channel';
 
-@Entity('users')
-class User {
-  @PrimaryColumn()
-  readonly id: string;
+@Entity("users")
+export class User {
+    @PrimaryGeneratedColumn("uuid")
+    id: string;
 
-  @Column()
-  name: string;
+    @Column({ unique: true })
+    @IsEmail()
+    email: string;
 
-  @Column()
-  email: string;
+    @Column()
+    @Length(4, 20)
+    firstName: string;
 
-  @Column()
-  admin: boolean;
+    @CreateDateColumn()
+    created_at: Date;
+  
+    @UpdateDateColumn()
+    updated_at: Date;
 
-  @CreateDateColumn()
-  created_at: Date;
-
-  @UpdateDateColumn()
-  updated_at: Date;
-
-  constructor() {
-    if (!this.id) {
-      this.id = uuid();
-    }
-  }
+    @OneToOne(() => Channel, (channel) => channel.user)
+    channel: Channel;
 }
-
-export {User};
